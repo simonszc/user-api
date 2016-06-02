@@ -14,9 +14,9 @@ router.post('/signup', bodyParser, (req, res, next) => {
   req.body.password = null;
   User.findOne({username: req.body.username}, (err, user) => {
     if (err || user) return next(new Error('could not create user'));
-    newUser.save((err) => {
+    newUser.save((err, newUser) => {
       if (err) return next(new Error('could not create user'));
-      res.json({token: 'token'});
+      res.json({token: newUser.generateToken()});
     });
   });
 });
@@ -25,6 +25,6 @@ router.get('/signin', basicHTTP, (req, res, next) => {
   User.findOne({username: req.auth.username}, (err, user) => {
     if(err || !user) return next(new Error('could not sign in'));
     if(!user.comparePassword(req.auth.password)) return next(new Error('could not sign in'));
-    res.json({token: 'token'});
+    res.json({token: user.generateToken()});
   });
 });
